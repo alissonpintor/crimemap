@@ -1,16 +1,71 @@
+<!DOCTYPE html>
 <html>
   <head>
-      <title>Crime Map</title>
+    <!-- This stylesheet contains specific styles for displaying the map
+         on this page. Replace it with your own styles as described in the
+         documentation:
+         https://developers.google.com/maps/documentation/javascript/tutorial
+       <link rel="stylesheet" href="https://google-developers.appspot.com/maps/documentation/javascript/demos/demos.css">-->
+       <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   </head>
   <body>
-      <h1>Crime Map</h1>
-      <form action="/add" method="POST">
-          <input type="text" name="userinput">
-          <input type="submit" value="Submit">
-      </form>
-      <a href="/clear">clear</a>
-      {% for userinput in data %}
-        <p>{{userinput}}</p>
-      {% endfor %}
+    <h1>CrimeMap</h1>
+    <p>A map of recent criminal activity in the Grahamstown area.</p>
+
+    <div id="map"></div>
+    <div id="newcrimeform">
+        <h2>Submit new crime</h2>
+        <form action="/submitcrime" method="POST">
+            <label for="category">Category</label>
+            <select name="category" id="category">
+              <option value="mugging">Mugging</option>
+              <option value="breakin">Break-in</option>
+            </select>
+            <label for="date">Date</label>
+            <input name="date" id="date" type="date">
+            <label for="latitude">Latitude</label>
+            <input name="latitude" id="latitude" type="text">
+            <label for="longitude">Longitude</label>
+            <input name="longitude" id="longitude" type="text">
+            <label for="description">Description</label>
+            <textarea name="description" id="description" placeholder="A brief but detailed description of the crime"></textarea>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <script>
+      var map;
+      var marker;
+
+      function initMap() {
+        // Create a map object and specify the DOM element for display.
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: -33.30578381949298, lng: 26.523442268371582},
+          scrollwheel: false,
+          zoom: 15
+        });
+
+        google.maps.event.addListener(map, 'click', function(event){
+          placeMarker(event.latLng);
+        });
+
+        function placeMarker(location) {
+          if(marker){
+            marker.setPosition(location);
+          }else{
+            marker = new google.maps.Marker({
+              position: location,
+              map: map
+            });
+          }
+
+          document.getElementById('latitude').value = location.lat();
+          document.getElementById('longitude').value = location.lng();
+        }
+
+      }
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCjB9zPzoVw5ayqokl9OTT0DE9w1Of1nyI&callback=initMap" async defer></script>
   </body>
 </html>
